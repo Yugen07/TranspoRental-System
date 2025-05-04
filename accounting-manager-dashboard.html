@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TranspoRental - Accounting</title>
+
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-image: url('img/carousel-2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2); /* Decrease opacity here */
+            z-index: -1;
+        }
+
+        /* Class to apply the overlay effect when needed */
+        body.dimmed::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1040; /* Just below Bootstrap modal (z-index: 1050) */
+        }
+
+        /* Remove the dimming effect when a modal is open */
+        body.modal-open::before {
+            content: none;
+        }
+
+
+        main {
+            flex: 1;
+            z-index: 1;
+        }
+
+        footer {
+            margin-top: auto;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-text {
+            color: #fff;
+        }
+
+        .btn {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-success,
+        .btn-warning,
+        .btn-info,
+        .btn-dark {
+            border-radius: 30px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #f8f9fa;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #e0e0e0;
+        }
+
+        /* Styling for the burger icon */
+        .burger-menu {
+            display: block;
+            cursor: pointer;
+            font-size: 30px;
+            color: #fff;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%); /* Vertically center the burger icon */
+            z-index: 10;
+        }
+
+        .burger-menu.active {
+            color: #ddd;
+        }
+
+        /* The sliding menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #222;
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu .menu-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+            font-size: 18px;
+        }
+
+        .side-menu .menu-link:hover {
+            background-color: #333;
+        }
+
+        /* Navbar adjustments to make sure burger icon is aligned with brand */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Add some space between the icon and the name */
+        }
+
+        .navbar-toggler {
+            display: none; /* Hide the default toggler */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <div class="burger-menu" id="burgerMenu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <a class="navbar-brand" href="index.html"><i class="fas fa-car-side me-2"></i>TranspoRental</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="accounting-manager-dashboard.html">Accounting</a></li>
+                    <li class="nav-item"><a class="nav-link" href="operation.html">Operations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="qc-manager.html">Quality Control</a></li>
+                    <li class="nav-item"><a class="nav-link" href="marketing-dashboard.html">Marketing & Sales</a></li>
+                    <li class="nav-item"><a class="nav-link" href="customer.html">Customer</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="side-menu" id="sideMenu">
+        <a href="admin.html" class="menu-link">Admin</a>
+        <a href="accounting-manager-dashboard.html" class="menu-link">Accounting</a>
+        <a href="operation.html" class="menu-link">Operations</a>
+        <a href="qc-manager.html" class="menu-link">Quality Control</a>
+        <a href="marketing-dashboard.html" class="menu-link">Marketing & Sales</a>
+        <a href="customer.html" class="menu-link">Customer Portal</a>
+    </div>
+
+
+    <main class="container my-5">
+        <h2 class="text-center mb-4">Accounting Manager Dashboard</h2>
+
+        <ul class="nav nav-pills justify-content-center mb-4" id="accountingTabs">
+            <li class="nav-item">
+                <button class="nav-link active text-white" onclick="showSection('paymentSection', event)">Payment
+                    Verification</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link text-white" onclick="showSection('chargesSection', event)">Post-Rental Charges</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link text-white" onclick="showSection('refundSection', event)">Refund Processing</button>
+            </li>
+        </ul>
+
+        <div id="paymentSection" class="process-section">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Customer Name</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#paymentModal">
+                            <td>TXN00123</td>
+                            <td>Juan Dela Cruz</td>
+                            <td>₱5,000.00</td>
+                            <td>Pending</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#paymentModal">
+                            <td>TXN00124</td>
+                            <td>Maria Reyes</td>
+                            <td>₱2,500.00</td>
+                            <td>Paid</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#paymentModal">
+                            <td>TXN00125</td>
+                            <td>Jose Santos</td>
+                            <td>₱7,500.00</td>
+                            <td>Pending</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="chargesSection" class="process-section d-none">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Customer Name</th>
+                            <th>Charge Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#chargesModal">
+                            <td>BK00111</td>
+                            <td>Maria Santos</td>
+                            <td>Damage Fee</td>
+                            <td>Pending</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#chargesModal">
+                            <td>BK00112</td>
+                            <td>Ricardo Diaz</td>
+                            <td>Late Return</td>
+                            <td>Approved</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#chargesModal">
+                            <td>BK00113</td>
+                            <td>Elena Garcia</td>
+                            <td>Cleaning</td>
+                            <td>Pending</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="refundSection" class="process-section d-none">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Customer Name</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#refundModal">
+                            <td>TXN00130</td>
+                            <td>Andres Bonifacio</td>
+                            <td>Overcharge</td>
+                            <td>Review</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#refundModal">
+                            <td>TXN00131</td>
+                            <td>Gregoria de Jesus</td>
+                            <td>Cancellation</td>
+                            <td>Approved</td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#refundModal">
+                            <td>TXN00132</td>
+                            <td>Emilio Aguinaldo</td>
+                            <td>Service Issue</td>
+                            <td>Pending</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true"
+        data-bs-backdrop="false">
+       <div class="modal-dialog modal-lg modal-dialog-scrollable">
+           <div class="modal-content bg-dark text-white">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="paymentModalLabel">Payment Verification</h5>
+                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                           aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   <form>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label for="paymentTransactionId" class="form-label">Transaction ID</label>
+                               <input type="text" class="form-control bg-dark text-white" id="paymentTransactionId" readonly>
+                           </div>
+                           <div class="col-md-6">
+                               <label for="paymentCustomerName" class="form-label">Customer Name</label>
+                               <input type="text" class="form-control bg-dark text-white" id="paymentCustomerName" readonly>
+                           </div>
+                       </div>
+                       <div class="mb-3">
+                           <label class="form-label">Transaction Reference</label>
+                           <input type="text" class="form-control bg-dark text-white">
+                       </div>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label class="form-label">Amount Verified</label><br />
+                               <div class="form-check form-check-inline">
+                                   <input class="form-check-input bg-dark" type="radio" name="verify" value="Yes">
+                                   <label class="form-check-label">Yes</label>
+                               </div>
+                               <div class="form-check form-check-inline">
+                                   <input class="form-check-input bg-dark" type="radio" name="verify" value="No">
+                                   <label class="form-check-label">No</label>
+                               </div>
+                           </div>
+                           <div class="col-md-6">
+                               <label class="form-label">Approval Status</label>
+                               <select class="form-select bg-dark text-white">
+                                   <option>Approved</option>
+                                   <option>Declined</option>
+                                   <option>On Hold</option>
+                               </select>
+                           </div>
+                       </div>
+                       <div class="mb-3">
+                           <label class="form-label">Discrepancy Notes</label>
+                           <textarea class="form-control bg-dark text-white" rows="2"></textarea>
+                       </div>
+                       <button type="submit" class="btn btn-secondary w-100">Submit</button>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </div>
+   
+   <div class="modal fade" id="chargesModal" tabindex="-1" aria-labelledby="chargesModalLabel" aria-hidden="true"
+        data-bs-backdrop="false">
+       <div class="modal-dialog modal-lg modal-dialog-scrollable">
+           <div class="modal-content bg-dark text-white">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="chargesModalLabel">Post-Rental Charges</h5>
+                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                           aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   <form>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label for="chargesBookingId" class="form-label">Booking ID</label>
+                               <input type="text" class="form-control bg-dark text-white" id="chargesBookingId" readonly>
+                           </div>
+                           <div class="col-md-6">
+                               <label for="chargesCustomerName" class="form-label">Customer Name</label>
+                               <input type="text" class="form-control bg-dark text-white" id="chargesCustomerName" readonly>
+                           </div>
+                       </div>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label class="form-label">Charge Type</label>
+                               <select class="form-select bg-dark text-white">
+                                   <option>Damage Fee</option>
+                                   <option>Late Return</option>
+                                   <option>Cleaning</option>
+                               </select>
+                           </div>
+                           <div class="col-md-6">
+                               <label class="form-label">Amount</label>
+                               <input type="number" class="form-control bg-dark text-white">
+                           </div>
+                       </div>
+                       <div class="mb-3">
+                           <label class="form-label">Description</label>
+                           <textarea class="form-control bg-dark text-white" rows="2"></textarea>
+                       </div>
+                       <div class="mb-3">
+                           <label class="form-label">Upload Evidence</label>
+                           <input type="file" class="form-control bg-dark text-white">
+                       </div>
+                       <button type="submit" class="btn btn-warning w-100">Submit</button>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </div>
+   
+   <div class="modal fade" id="refundModal" tabindex="-1" aria-labelledby="refundModalLabel" aria-hidden="true"
+        data-bs-backdrop="false">
+       <div class="modal-dialog modal-lg modal-dialog-scrollable">
+           <div class="modal-content bg-dark text-white">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="refundModalLabel">Refund Request</h5>
+                   <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                           aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   <form>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label for="refundTransactionId" class="form-label">Transaction ID</label>
+                               <input type="text" class="form-control bg-dark text-white" id="refundTransactionId" readonly>
+                           </div>
+                           <div class="col-md-6">
+                               <label for="refundCustomerName" class="form-label">Customer Name</label>
+                               <input type="text" class="form-control bg-dark text-white" id="refundCustomerName" readonly>
+                           </div>
+                       </div>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label class="form-label">Refund Reason</label>
+                               <textarea class="form-control bg-dark text-white" rows="2"></textarea>
+                           </div>
+                           <div class="col-md-6">
+                               <label class="form-label">Refund Amount</label>
+                               <input type="number" class="form-control bg-dark text-white">
+                           </div>
+                       </div>
+                       <div class="row mb-3">
+                           <div class="col-md-6">
+                               <label class="form-label">Approval Status</label>
+                               <select class="form-select bg-dark text-white">
+                                   <option>Approved</option>
+                                   <option>Declined</option>
+                                   <option>Needs Review</option>
+                               </select>
+                           </div>
+                           <div class="col-md-6">
+                               <label class="form-label">Final Notes</label>
+                               <textarea class="form-control bg-dark text-white" rows="2"></textarea>
+                           </div>
+                       </div>
+                       <button type="submit" class="btn btn-danger w-100">Submit</button>
+                   </form>
+               </div>
+           </div>
+       </div>
+   </div>
+    </main>
+    
+
+    <script>
+        function showSection(id, event) {
+            document.querySelectorAll('.process-section').forEach(s => s.classList.add('d-none'));
+            document.getElementById(id).classList.remove('d-none');
+
+            document.querySelectorAll('#accountingTabs .nav-link').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Handle background dimming and populate modal data with values from the clicked row
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentModalEl = document.getElementById('paymentModal');
+        const chargesModalEl = document.getElementById('chargesModal');
+        const refundModalEl = document.getElementById('refundModal');
+
+        paymentModalEl.addEventListener('show.bs.modal', event => {
+            document.body.classList.add('dimmed');
+            const triggerRow = event.relatedTarget;
+            const transactionId = triggerRow.querySelector('td:nth-child(1)').textContent;
+            const customerName = triggerRow.querySelector('td:nth-child(2)').textContent;
+
+            document.getElementById('paymentTransactionId').value = transactionId;
+            document.getElementById('paymentCustomerName').value = customerName;
+        });
+
+        chargesModalEl.addEventListener('show.bs.modal', event => {
+            document.body.classList.add('dimmed');
+            const triggerRow = event.relatedTarget;
+            const bookingId = triggerRow.querySelector('td:nth-child(1)').textContent;
+            const customerName = triggerRow.querySelector('td:nth-child(2)').textContent;
+
+            document.getElementById('chargesBookingId').value = bookingId;
+            document.getElementById('chargesCustomerName').value = customerName;
+        });
+
+        refundModalEl.addEventListener('show.bs.modal', event => {
+            document.body.classList.add('dimmed');
+            const triggerRow = event.relatedTarget;
+            const transactionId = triggerRow.querySelector('td:nth-child(1)').textContent;
+            const customerName = triggerRow.querySelector('td:nth-child(2)').textContent;
+
+            document.getElementById('refundTransactionId').value = transactionId;
+            document.getElementById('refundCustomerName').value = customerName;
+        });
+
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modalEl => {
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('dimmed');
+            });
+        });
+    });
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Toggle the side menu
+        const burgerMenu = document.getElementById("burgerMenu");
+        const sideMenu = document.getElementById("sideMenu");
+
+        burgerMenu.addEventListener("click", function() {
+            sideMenu.classList.toggle("active");
+            this.classList.toggle("active");
+        });
+
+        // Close the menu when not hovering over it
+        sideMenu.addEventListener("mouseleave", function() {
+            sideMenu.classList.remove("active");
+            burgerMenu.classList.remove("active");
+        });
+    </script>
+
+    <footer class="bg-dark text-white text-center py-3">
+        <div class="container">
+            <small>&copy; 2025 TranspoRental. All rights reserved.</small>
+        </div>
+    </footer>
+</body>
+
+</html>

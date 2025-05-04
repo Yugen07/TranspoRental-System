@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TranspoRental - Quality Control</title>
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-image: url('img/carousel-2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: -1;
+        }
+
+        body.dimmed::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1040;
+        }
+
+        body.modal-open::before {
+            content: none;
+        }
+
+        main {
+            flex: 1;
+            z-index: 1;
+        }
+
+        footer {
+            margin-top: auto;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-text {
+            color: #fff;
+        }
+
+        .btn {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-success,
+        .btn-warning,
+        .btn-info,
+        .btn-dark {
+            border-radius: 30px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #f8f9fa;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #e0e0e0;
+        }
+
+        .burger-menu {
+            display: block;
+            cursor: pointer;
+            font-size: 30px;
+            color: #fff;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .burger-menu.active {
+            color: #ddd;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #222;
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu .menu-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+            font-size: 18px;
+        }
+
+        .side-menu .menu-link:hover {
+            background-color: #333;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .navbar-toggler {
+            display: none;
+        }
+
+        .modal-content {
+            background-color: #343a40;
+            color: #f8f9fa;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-body {
+            background-color: transparent;
+        }
+
+        .modal-header {
+            background-color: transparent;
+            border-bottom: 1px solid #495057;
+        }
+
+        .modal-footer {
+            background-color: transparent;
+            border-top: 1px solid #495057;
+        }
+
+        .form-control::placeholder,
+        .form-control,
+        .form-select {
+            color: #fff !important;
+        }
+
+        .form-control:-ms-input-placeholder {
+            color: #fff !important;
+        }
+
+        .form-control::-ms-input-placeholder {
+            color: #fff !important;
+        }
+
+        .form-control,
+        .form-select,
+        .form-range {
+            background-color: #495057;
+            color: #fff;
+            border: 1px solid #6c757d;
+        }
+
+        .form-control:focus,
+        .form-select:focus,
+        .form-range:focus {
+            background-color: #5a6268;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-select option {
+            background-color: #343a40;
+            color: #f8f9fa;
+        }
+
+        .form-check-input {
+            background-color: #495057;
+            border: 1px solid #6c757d;
+        }
+
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .nav-pills.form-nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-pills.form-nav .nav-link {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 0.25rem;
+            margin: 0 0.5rem;
+        }
+
+        .nav-pills.form-nav .nav-link.active {
+            background-color: #0056b3;
+        }
+
+        .process-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <div class="burger-menu" id="burgerMenu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <a class="navbar-brand" href="index.html"><i class="fas fa-car-side me-2"></i>TranspoRental</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="accounting-manager-dashboard.html">Accounting</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#operations">Operations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="qc-manager.html">Quality Control</a></li>
+                    <li class="nav-item"><a class="nav-link" href="marketing-dashboard.html">Marketing & Sales</a></li>
+                    <li class="nav-item"><a class="nav-link" href="customer.html">Customer</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="side-menu" id="sideMenu" data-bs-backdrop="false">
+        <a href="admin.html" class="menu-link">Admin</a>
+        <a href="accounting-manager-dashboard.html" class="menu-link">Accounting</a>
+        <a href="#operations" class="menu-link">Operations</a>
+        <a href="qc-manager.html" class="menu-link">Quality Control</a>
+        <a href="marketing-dashboard.html" class="menu-link">Marketing & Sales</a>
+        <a href="customer.html" class="menu-link">Customer</a>
+    </div>
+
+    <main class="container my-5">
+        <h2 class="text-center mb-4">Quality Control Manager Dashboard</h2>
+
+        <ul class="nav nav-pills justify-content-center mb-4" id="qcTabs">
+            <li class="nav-item">
+                <button class="nav-link active text-light" onclick="showSection('preRentalSection', event)">Pre-Rental Inspections</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link text-light" onclick="showSection('postRentalSection', event)">Post-Rental Inspections</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link text-light" onclick="showSection('maintenanceSection', event)">Maintenance Requests</button>
+            </li>
+        </ul>
+
+        <div id="preRentalSection" class="process-section">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Vehicle ID</th>
+                            <th>Scheduled Pickup</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#preRentalModal">
+                            <td>VHC001</td>
+                            <td>2025-05-06 10:00</td>
+                            <td>Pending Inspection</td>
+                            <td><button class="btn btn-info btn-sm">Inspect</button></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#preRentalModal">
+                            <td>VHC002</td>
+                            <td>2025-05-06 14:30</td>
+                            <td>Pending Inspection</td>
+                            <td><button class="btn btn-info btn-sm">Inspect</button></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#preRentalModal">
+                            <td>VHC005</td>
+                            <td>2025-05-07 09:00</td>
+                            <td>Ready for Pickup</td>
+                            <td><span class="text-success"><i class="fas fa-check-circle"></i> Approved</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="postRentalSection" class="process-section d-none">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Vehicle ID</th>
+                            <th>Date of Return</th>
+                            <th>New Damages?</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#postRentalModal">
+                            <td>VHC003</td>
+                            <td>2025-05-05 16:00</td>
+                            <td>Yes</td>
+                            <td><button class="btn btn-warning btn-sm">Review</button></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#postRentalModal">
+                            <td>VHC004</td>
+                            <td>2025-05-05 18:45</td>
+                            <td>No</td>
+                            <td><span class="text-success"><i class="fas fa-check-circle"></i> Clean & Ready</span></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#postRentalModal">
+                            <td>VHC006</td>
+                            <td>2025-05-06 11:30</td>
+                            <td>Yes</td>
+                            <td><button class="btn btn-warning btn-sm">Review</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="maintenanceSection" class="process-section d-none">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover table-bordered align-middle">
+                    <thead class="table-secondary text-dark">
+                        <tr>
+                            <th>Vehicle ID</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Assigned To</th>
+                            <th>Est. Repair Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                            <td>VHC003</td>
+                            <td>Body Repair</td>
+                            <td>High</td>
+                            <td>Technician A</td>
+                            <td>2025-05-08</td>
+                            <td><button class="btn btn-primary btn-sm">View</button></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                            <td>VHC007</td>
+                            <td>Oil Change</td>
+                            <td>Medium</td>
+                            <td>Technician B</td>
+                            <td>2025-05-07</td>
+                            <td><button class="btn btn-primary btn-sm">View</button></td>
+                        </tr>
+                        <tr data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                            <td>VHC001</td>
+                            <td>Tire Replacement</td>
+                            <td>High</td>
+                            <td>Technician A</td>
+                            <td>2025-05-07</td>
+                            <td><button class="btn btn-primary btn-sm">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal fade" id="preRentalModal" tabindex="-1" aria-labelledby="preRentalModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="preRentalModalLabel">Pre-Rental Inspection</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="preRentalForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="preRentalVehicleId" class="form-label">Vehicle ID</label>
+                                    <input type="text" class="form-control" id="preRentalVehicleId" value="VHC001" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="scheduledPickupTime" class="form-label">Scheduled Pickup Time</label>
+                                    <input type="datetime-local" class="form-control" id="scheduledPickupTime" value="2025-05-06T10:00" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="exteriorConditionNotes" class="form-label">Exterior Condition Notes</label>
+                                    <textarea class="form-control" id="exteriorConditionNotes" rows="3"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="interiorConditionNotes" class="form-label">Interior Condition Notes</label>
+                                    <textarea class="form-control" id="interiorConditionNotes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mechanical Checks</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="Engine" id="checkEngine">
+                                    <label class="form-check-label" for="checkEngine">Engine Condition</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="Tires" id="checkTires">
+                                    <label class="form-check-label" for="checkTires">Tire Pressure & Condition</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="Lights" id="checkLights">
+                                    <label class="form-check-label" for="checkLights">Lights & Signals</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="Brakes" id="checkBrakes">
+                                    <label class="form-check-label" for="checkBrakes">Brakes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="Safety" id="checkSafety">
+                                    <label class="form-check-label" for="checkSafety">Safety Features (Airbags, Seatbelts)</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fuelLevel" class="form-label">Fuel Level (%)</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="range" class="form-range me-2" id="fuelLevel" min="0" max="100">
+                                    <output class="form-output" for="fuelLevel" name="fuelLevelOutput">50</output>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ready for Pickup?</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="readyPickup" id="readyYes" value="Yes">
+                                    <label class="form-check-label" for="readyYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="readyPickup" id="readyNo" value="No" checked>
+                                    <label class="form-check-label" for="readyNo">No</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="finalRemarksPre" class="form-label">Final Remarks</label>
+                                <textarea class="form-control" id="finalRemarksPre" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="inspectorNamePre" class="form-label">Inspector Name</label>
+                                <input type="text" class="form-control" id="inspectorNamePre" value="QC Manager Name" readonly>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Submit Inspection</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="postRentalModal" tabindex="-1" aria-labelledby="postRentalModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="postRentalModalLabel">Post-Rental Inspection</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="postRentalForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="postRentalVehicleId" class="form-label">Vehicle ID</label>
+                                    <input type="text" class="form-control" id="postRentalVehicleId" value="VHC003" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="dateOfReturn" class="form-label">Date of Return</label>
+                                    <input type="datetime-local" class="form-control" id="dateOfReturn" value="2025-05-05T16:00" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">New Damages Detected?</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="newDamages" id="damagesYes" value="Yes" checked>
+                                        <label class="form-check-label" for="damagesYes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="newDamages" id="damagesNo" value="No">
+                                        <label class="form-check-label" for="damagesNo">No</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="damageType" class="form-label">Damage Type</label>
+                                    <select class="form-select" id="damageType">
+                                        <option value="">Select Damage Type</option>
+                                        <option value="scratch">Scratch</option>
+                                        <option value="dent">Dent</option>
+                                        <option value="broken_light">Broken Light</option>
+                                        <option value="tire_damage">Tire Damage</option>
+                                        <option value="windshield_crack">Windshield Crack</option>
+                                        <option value="interior_damage">Interior Damage</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="costEstimate" class="form-label">Cost Estimate</label>
+                                    <input type="number" class="form-control" id="costEstimate">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="uploadPhotos" class="form-label">Upload Photos</label>
+                                    <input type="file" class="form-control" id="uploadPhotos" multiple>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Forward to Accounting?</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="forwardAccounting" id="forwardYes" value="Yes" checked>
+                                    <label class="form-check-label" for="forwardYes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="forwardAccounting" id="forwardNo" value="No">
+                                    <label class="form-check-label" for="forwardNo">No</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100">Submit Post-Rental Inspection</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="maintenanceModal" tabindex="-1" aria-labelledby="maintenanceModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="maintenanceModalLabel">Maintenance Request Details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="maintenanceRequestForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="maintenanceVehicleId" class="form-label">Vehicle ID</label>
+                                    <input type="text" class="form-control" id="maintenanceVehicleId" value="VHC003" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="maintenanceType" class="form-label">Maintenance Type</label>
+                                    <input type="text" class="form-control" id="maintenanceType" value="Body Repair" readonly>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="maintenanceDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="maintenanceDescription" rows="3">Damage on the rear bumper.</textarea>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="priorityLevel" class="form-label">Priority Level</label>
+                                    <input type="text" class="form-control" id="priorityLevel" value="High" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="assignedTechnician" class="form-label">Assigned Technician</label>
+                                    <select class="form-select" id="assignedTechnician">
+                                        <option value="Technician A" selected>Technician A</option>
+                                        <option value="Technician B">Technician B</option>
+                                        <option value="Technician C">Technician C</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="estimatedRepairDate" class="form-label">Estimated Repair Date</label>
+                                    <input type="date" class="form-control" id="estimatedRepairDate" value="2025-05-08">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="repairNotes" class="form-label">Repair Notes</label>
+                                    <textarea class="form-control" id="repairNotes" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Update Maintenance Request</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const sideMenu = document.getElementById('sideMenu');
+
+            if (burgerMenu && sideMenu) {
+                burgerMenu.addEventListener('click', function() {
+                    sideMenu.classList.toggle('active');
+                    burgerMenu.classList.toggle('active');
+                    document.body.classList.remove('dimmed');
+                });
+
+                const menuLinks = sideMenu.querySelectorAll('.menu-link');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        sideMenu.classList.remove('active');
+                        burgerMenu.classList.remove('active');
+                    });
+                });
+            }
+        });
+
+        function showSection(id, event) {
+            document.querySelectorAll('.process-section').forEach(s => s.classList.add('d-none'));
+            document.getElementById(id).classList.remove('d-none');
+            document.querySelectorAll('#qcTabs .nav-link').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        const preRentalModalEl = document.getElementById('preRentalModal');
+        const postRentalModalEl = document.getElementById('postRentalModal');
+        const maintenanceModalEl = document.getElementById('maintenanceModal');
+
+        if (preRentalModalEl) {
+            preRentalModalEl.addEventListener('show.bs.modal', event => {
+                document.body.classList.add('dimmed');
+                const triggerRow = event.relatedTarget;
+                if (triggerRow) {
+                    const vehicleId = triggerRow.querySelector('td:nth-child(1)').textContent;
+                    const pickupTime = triggerRow.querySelector('td:nth-child(2)').textContent;
+                    document.getElementById('preRentalVehicleId').value = vehicleId;
+                    document.getElementById('scheduledPickupTime').value = pickupTime.replace(' ', 'T');
+                }
+            });
+            preRentalModalEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('dimmed');
+            });
+        }
+
+        if (postRentalModalEl) {
+            postRentalModalEl.addEventListener('show.bs.modal', event => {
+                document.body.classList.add('dimmed');
+                const triggerRow = event.relatedTarget;
+                if (triggerRow) {
+                    const vehicleId = triggerRow.querySelector('td:nth-child(1)').textContent;
+                    const returnTime = triggerRow.querySelector('td:nth-child(2)').textContent;
+                    document.getElementById('postRentalVehicleId').value = vehicleId;
+                    document.getElementById('dateOfReturn').value = returnTime.replace(' ', 'T');
+                }
+            });
+            postRentalModalEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('dimmed');
+            });
+        }
+
+        if (maintenanceModalEl) {
+            maintenanceModalEl.addEventListener('show.bs.modal', event => {
+                document.body.classList.add('dimmed');
+                const triggerRow = event.relatedTarget;
+                if (triggerRow) {
+                    const vehicleId = triggerRow.querySelector('td:nth-child(1)').textContent;
+                    const maintenanceType = triggerRow.querySelector('td:nth-child(2)').textContent;
+                    document.getElementById('maintenanceVehicleId').value = vehicleId;
+                    document.getElementById('maintenanceType').value = maintenanceType;
+                }
+            });
+            maintenanceModalEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('dimmed');
+            });
+        }
+
+        const fuelLevelInput = document.getElementById('fuelLevel');
+        const fuelLevelOutput = document.querySelector('.form-output[for="fuelLevel"]');
+        if (fuelLevelInput && fuelLevelOutput) {
+            fuelLevelInput.addEventListener('input', function() {
+                fuelLevelOutput.value = this.value;
+            });
+        }
+    </script>
+
+    <footer class="bg-dark text-white text-center py-3">
+        <div class="container">
+            <small>© 2025 TranspoRental. All rights reserved.</small>
+        </div>
+    </footer>
+</body>
+</html>

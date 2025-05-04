@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TranspoRental - Customer Dashboard</title>
+
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            color: #f8f9fa;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-image: url('img/carousel-2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        main {
+            flex: 1;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        footer {
+            margin-top: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            text-align: center;
+            padding: 10px 0;
+            color: #e9ecef;
+        }
+
+        .dashboard-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .dashboard-card {
+            background-color: rgba(33, 37, 41, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            color: #f8f9fa;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-title {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .card-value {
+            font-size: 2em;
+            color: #adb5bd;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .booking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .booking-table th,
+        .booking-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+            color: #e9ecef;
+        }
+
+        .booking-table th {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .booking-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn-primary,
+        .btn-success,
+        .btn-warning,
+        .btn-info,
+        .btn-outline-light,
+        .btn-outline-warning,
+        .btn-danger,
+        .btn-secondary {
+            border-radius: 30px;
+            color: #fff;
+            font-weight: 600;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-outline-light,
+        .btn-outline-warning {
+            border-color: #f8f9fa;
+        }
+
+        .btn-outline-light:hover,
+        .btn-outline-warning:hover {
+            border-color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .burger-menu {
+            display: block;
+            cursor: pointer;
+            font-size: 30px;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            color: #fff;
+        }
+
+        .burger-menu.active {
+            color: #ddd;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #343a40;
+            z-index: 999;
+            transition: left 0.3s ease;
+            padding-top: 60px;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu .menu-link {
+            color: #e9ecef;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+            font-size: 18px;
+        }
+
+        .side-menu .menu-link:hover {
+            background-color: #495057;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #fff;
+        }
+
+        .navbar-toggler {
+            display: none;
+        }
+
+        body.dimmed-for-menu::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+        }
+
+        .shifted {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .action-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .action-list li {
+            margin-bottom: 10px;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 30px;
+            background-color: #007bff;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 600;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+
+        .action-button i {
+            margin-right: 10px;
+        }
+
+        .alert {
+            background-color: rgba(255, 193, 7, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            color: #212529;
+        }
+
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.7);
+            color: #fff;
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.7);
+            color: #fff;
+        }
+
+        .modal-content {
+            background-color: #343a40;
+            color: #f8f9fa;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-control,
+        .form-select {
+            background-color: #495057;
+            color: #fff;
+            border: 1px solid #6c757d;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #5a6268;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        select.form-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=UTF-8,<svg fill="%23fff" viewBox="0 0 4 5"><path d="M2 0L0 2h4L2 0z"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: 100%;
+            background-position-y: 50%;
+            padding-right: 1.5rem;
+        }
+
+        select.form-select option {
+            color: #000;
+            background-color: #e9ecef;
+        }
+
+        select.form-select:focus option:checked {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .form-control::placeholder,
+        .form-select::placeholder {
+            color: #ced4da; /* Light placeholder color */
+        }
+
+        .btn-close-white {
+            filter: invert(1);
+        }
+
+        .main-content-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .main-content-row>* {
+            flex: 1 1 500px;
+            min-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <div class="burger-menu" id="burgerMenu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <a class="navbar-brand" href="index.html"><i class="fas fa-car-side me-2"></i>TranspoRental</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="vehicles.html" data-bs-toggle="modal" data-bs-target="#vehiclesModal">Vehicles</a></li>
+                    <li class="nav-item"><a class="nav-link" href="bookings.html" data-bs-toggle="modal" data-bs-target="#myBookingsModal">My Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="profile.html" data-bs-toggle="modal" data-bs-target="#myProfileModal">My Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="side-menu" id="sideMenu">
+        <a href="index.html" class="menu-link">Home</a>
+        <a href="vehicles.html" class="menu-link" data-bs-toggle="modal" data-bs-target="#vehiclesModalSide">Vehicles</a>
+        <a href="bookings.html" class="menu-link" data-bs-toggle="modal" data-bs-target="#myBookingsModalSide">My Bookings</a>
+        <a href="profile.html" class="menu-link" data-bs-toggle="modal" data-bs-target="#myProfileModalSide">My Profile</a>
+        <a href="#" class="menu-link" data-bs-toggle="modal" data-bs-target="#logoutModalSide">Logout</a>
+    </div>
+
+    <main class="container mt-5 pt-5 dashboard-container">
+        <h2 class="text-center mb-4">Welcome, Customer!</h2>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-calendar-alt card-icon"></i>
+                    <h5 class="card-title">Upcoming Bookings</h5>
+                    <p class="card-value" id="upcomingBookings">2</p>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#viewUpcomingBookings">View Details</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-history card-icon"></i>
+                    <h5 class="card-title">Booking History</h5>
+                    <p class="card-value" id="bookingHistoryCount">5</p>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#viewBookingHistory">View All</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card text-center">
+                    <i class="fas fa-user-circle card-icon"></i>
+                    <h5 class="card-title">Profile Status</h5>
+                    <p class="card-value text-success"><i class="fas fa-check-circle"></i> Complete</p>
+                    <button class="btn btn-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#editProfileCard">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 main-content-row">
+            <div class="col-md-8">
+                <div class="dashboard-card">
+                    <h5 class="card-title">Recent Bookings</h5>
+                    <div class="table-responsive">
+                        <table class="booking-table">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Pickup Date</th>
+                                    <th>Return Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BKG001</td>
+                                    <td>Sedan - Comfort</td>
+                                    <td>2025-05-05</td>
+                                    <td>2025-05-10</td>
+                                    <td>Confirmed</td>
+                                    <td><button class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#viewContractModal">View Contract</button></td>
+                                </tr>
+                                <tr>
+                                    <td>BKG002</td>
+                                    <td>SUV - Adventure</td>
+                                    <td>2025-05-15</td>
+                                    <td>2025-05-20</td>
+                                    <td>Pending Approval</td>
+                                    <td><button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#bookingDetailsModal">Details</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-outline-light btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#viewAllBookingsTable">View All Bookings</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <ul class="action-list">
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#findVehicleModal"><i class="fas fa-search"></i>Find & Book Vehicles</button>
+                        </li>
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#manageProfileModal"><i class="fas fa-user-edit"></i>Manage My Profile</button>
+                        </li>
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#contactSupportModal"><i class="fas fa-question-circle"></i>Contact Support</button>
+                        </li>
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#provideFeedbackModal"><i class="fas fa-comment-dots"></i>Provide Feedback</button>
+                        </li>
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#disputeChargeModal"><i class="fas fa-flag"></i>Dispute a Charge</button>
+                        </li>
+                        <li>
+                            <button class="action-button" data-bs-toggle="modal" data-bs-target="#requestRefundModal"><i class="fas fa-undo"></i>Request Refund</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="findVehicleModal" tabindex="-1" aria-labelledby="findVehicleModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="findVehicleModalLabel">Find and Book Vehicles</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Search for available vehicles and start your booking.</p>
+                        <form id="findVehicleForm">
+                            <div class="mb-3">
+                                <label for="pickupLocation" class="form-label">Pickup Location</label>
+                                <input type="text" class="form-control text-white bg-transparent border-secondary" id="pickupLocation" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pickupDate" class="form-label">Pickup Date</label>
+                                <input type="date" class="form-control text-white bg-transparent border-secondary" id="pickupDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="returnDate" class="form-label">Return Date</label>
+                                <input type="date" class="form-control text-white bg-transparent border-secondary" id="returnDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="vehicleType" class="form-label">Vehicle Type</label>
+                                <select class="form-select text-white bg-transparent border-secondary" id="vehicleType">
+                                    <option value="">Any</option>
+                                    <option value="sedan">Sedan</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="van">Van</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Search Vehicles</button>
+                        </form>
+
+                        <div id="vehicleSelection" class="mt-4" style="display:none;">
+                            <h3>Available Vehicles</h3>
+                            <p>Select a vehicle for your booking:</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="selectedVehicle" id="vehicle1" value="vehicle1">
+                                <label class="form-check-label" for="vehicle1">Sedan Comfort - P1500/day</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="selectedVehicle" id="vehicle2" value="vehicle2">
+                                <label class="form-check-label" for="vehicle2">SUV Adventure - P2000/day</label>
+                            </div>
+                            <button class="btn btn-success mt-3" onclick="showPaymentOptions()" disabled id="selectVehicleBtn">Select Vehicle</button>
+                        </div>
+
+                        <div id="paymentOptions" class="mt-4" style="display:none;">
+                            <h3>Payment Options</h3>
+                            <p>Choose your payment method:</p>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard">
+                                <label class="form-check-label" for="creditCard">Credit Card</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                                <label class="form-check-label" for="paypal">Paypal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="gcash" value="gcash">
+                                <label class="form-check-label" for="gcash">Gcash</label>
+                            </div>
+                            <button class="btn btn-primary mt-3" onclick="processPayment()" disabled id="processPaymentBtn">Proceed to Payment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="manageProfileModal" tabindex="-1" aria-labelledby="manageProfileModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manageProfileModalLabel">Manage Your Profile</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Update your personal information here.</p>
+                        <form id="manageProfileForm">
+                            <div class="mb-3">
+                                <label for="profileName" class="form-label">Name</label>
+                                <input type="text" class="form-control text-white bg-transparent border-secondary" id="profileName" value="Customer Name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="profileEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control text-white bg-transparent border-secondary" id="profileEmail" value="Customer Email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="profilePhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control text-white bg-transparent border-secondary" id="profilePhone">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="contactSupportModal" tabindex="-1" aria-labelledby="contactSupportModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="contactSupportModalLabel">Contact Customer Support</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>If you require assistance, please fill out the form below.</p>
+                        <form id="contactSupportForm">
+                            <div class="mb-3">
+                                <label for="supportSubject" class="form-label">Subject</label>
+                                <input type="text" class="form-control text-white bg-transparent border-secondary" id="supportSubject" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="supportMessage" class="form-label">Message</label>
+                                <textarea class="form-control text-white bg-transparent border-secondary" id="supportMessage" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Inquiry</button>
+                        </form>
+                        <p class="mt-3">Or call us at: <span class="text-info">+1 (555) 123-4567</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="provideFeedbackModal" tabindex="-1" aria-labelledby="provideFeedbackModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="provideFeedbackModalLabel">Provide Your Feedback</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your feedback is important to us. Please share your experience.</p>
+                        <form id="provideFeedbackForm">
+                            <div class="mb-3">
+                                <label for="feedbackRating" class="form-label">Overall Rating</label>
+                                <select class="form-select text-white bg-transparent border-secondary" id="feedbackRating">
+                                    <option value="5">Excellent</option>
+                                    <option value="4">Good</option>
+                                    <option value="3">Average</option>
+                                    <option value="2">Poor</option>
+                                    <option value="1">Very Poor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="feedbackComment" class="form-label">Comments</label>
+                                <textarea class="form-control text-white bg-transparent border-secondary" id="feedbackComment" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="disputeChargeModal" tabindex="-1" aria-labelledby="disputeChargeModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="disputeChargeModalLabel">Dispute a Charge</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>If you have a dispute regarding a charge, please provide the details below.</p>
+                        <form id="disputeChargeForm">
+                            <div class="mb-3" style="padding: 0 15px;">
+                                <label for="disputeBookingId" class="form-label">Booking ID</label>
+                                <input type="text" class="form-control text-white bg-transparent border-secondary" id="disputeBookingId" required>
+                            </div>
+                            <div class="mb-3" style="padding: 0 15px;">
+                                <label for="disputeDescription" class="form-label">Description of Dispute</label>
+                                <textarea class="form-control text-white bg-transparent border-secondary" id="disputeDescription" rows="4" required></textarea>
+                            </div>
+                            <div class="mb-3" style="padding: 0 15px;">
+                                <label for="disputeAmount" class="form-label">Disputed Amount (if applicable)</label>
+                                <input type="number" class="form-control text-white bg-transparent border-secondary" id="disputeAmount" step="0.01">
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-warning">Submit Dispute</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="requestRefundModal" tabindex="-1" aria-labelledby="requestRefundModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="requestRefundModalLabel">Request a Refund</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please provide the details below to request a refund.</p>
+                        <form id="requestRefundForm" onsubmit="event.preventDefault(); alert('Refund request submitted successfully!'); document.getElementById('requestRefundModal').classList.remove('show'); document.body.classList.remove('modal-open'); document.querySelector('.modal-backdrop').remove();">
+                            <div class="row mb-3">
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundTransactionId" class="form-label">Transaction ID</label>
+                                    <select class="form-select text-white bg-transparent border-secondary" id="refundTransactionId" required>
+                                        <option value="TXN00130">TXN00130</option>
+                                        <option value="TXN00131">TXN00131</option>
+                                        <option value="TXN00132">TXN00132</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundCustomerName" class="form-label">Customer Name</label>
+                                    <input type="text" class="form-control text-white bg-transparent border-secondary" id="refundCustomerName" value="Andres Bonifacio" readonly>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundReason" class="form-label">Refund Reason</label>
+                                    <textarea class="form-control text-white bg-transparent border-secondary" id="refundReason" rows="4" required placeholder="e.g., Booking was cancelled due to unforeseen circumstances"></textarea>
+                                </div>
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundAmount" class="form-label">Refund Amount</label>
+                                    <input type="number" class="form-control text-white bg-transparent border-secondary" id="refundAmount" step="0.01" required placeholder="e.g., 1500">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundApprovalStatus" class="form-label">Approval Status</label>
+                                    <input type="text" class="form-control text-white bg-transparent border-secondary" id="refundApprovalStatus" value="Pending" readonly>
+                                </div>
+                                <div class="col-md-6" style="padding: 0 15px;">
+                                    <label for="refundFinalNotes" class="form-label">Final Notes</label>
+                                    <textarea class="form-control text-white bg-transparent border-secondary" id="refundFinalNotes" rows="3" placeholder="e.g., Please process the refund as soon as possible"></textarea>
+                                </div>
+                            </div>
+                            <div class="text-start">
+                                <button type="submit" class="btn btn-danger">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="vehiclesModal" tabindex="-1" aria-labelledby="vehiclesModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="vehiclesModalLabel">Vehicles</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to the vehicles page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='vehicles.html';">Go to Vehicles</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myBookingsModal" tabindex="-1" aria-labelledby="myBookingsModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myBookingsModalLabel">My Bookings</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to your bookings page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='bookings.html';">Go to My Bookings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myProfileModal" tabindex="-1" aria-labelledby="myProfileModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myProfileModalLabel">My Profile</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to your profile page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='profile.html';">Go to My Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">Logout</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to logout?</p>
+                        <button class="btn btn-danger" onclick="window.location.href='#';">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="homeModalSide" tabindex="-1" aria-labelledby="homeModalSideLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="homeModalSideLabel">Home</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>You are already on the home page.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="vehiclesModalSide" tabindex="-1" aria-labelledby="vehiclesModalSideLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="vehiclesModalSideLabel">Vehicles</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to the vehicles page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='vehicles.html';">Go to Vehicles</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myBookingsModalSide" tabindex="-1" aria-labelledby="myBookingsModalSideLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myBookingsModalSideLabel">My Bookings</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to your bookings page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='bookings.html';">Go to My Bookings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="myProfileModalSide" tabindex="-1" aria-labelledby="myProfileModalSideLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myProfileModalSideLabel">My Profile</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to your profile page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='profile.html';">Go to My Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="logoutModalSide" tabindex="-1" aria-labelledby="logoutModalSideLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalSideLabel">Logout</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to logout?</p>
+                        <button class="btn btn-danger" onclick="window.location.href='#';">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="viewUpcomingBookings" tabindex="-1" aria-labelledby="viewUpcomingBookingsLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewUpcomingBookingsLabel">Upcoming Bookings</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Details of your upcoming bookings will be displayed here.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='bookings.html';">View Bookings Page</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="viewBookingHistory" tabindex="-1" aria-labelledby="viewBookingHistoryLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewBookingHistoryLabel">Booking History</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Your past booking history will be shown here.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='bookings.html?history=true';">View Booking History</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="editProfileCard" tabindex="-1" aria-labelledby="editProfileCardLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileCardLabel">Edit Profile</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>You can edit your profile information here.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='profile.html';">Go to Edit Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="viewContractModal" tabindex="-1" aria-labelledby="viewContractModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewContractModalLabel">View Contract</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>The contract for booking ID BKG001 will be displayed here.</p>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Details for booking ID BKG002 (Pending Approval) will be shown here.</p>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="viewAllBookingsTable" tabindex="-1" aria-labelledby="viewAllBookingsTableLabel" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewAllBookingsTableLabel">All Bookings</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This will navigate to the full bookings page.</p>
+                        <button class="btn btn-primary" onclick="window.location.href='bookings.html';">Go to All Bookings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-dark text-center py-3">
+        <p class="mb-0">© 2025 TranspoRental. All Rights Reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const sideMenu = document.getElementById('sideMenu');
+            const mainContent = document.querySelector('main');
+            const navbar = document.querySelector('.navbar');
+            const modals = document.querySelectorAll('.modal');
+            const findVehicleForm = document.getElementById('findVehicleForm');
+            const vehicleSelectionDiv = document.getElementById('vehicleSelection');
+            const selectVehicleBtn = document.getElementById('selectVehicleBtn');
+            const paymentOptionsDiv = document.getElementById('paymentOptions');
+            const processPaymentBtn = document.getElementById('processPaymentBtn');
+            let selectedVehicle = null;
+            let paymentMethod = null;
+
+            burgerMenu.addEventListener('click', function () {
+                burgerMenu.classList.toggle('active');
+                sideMenu.classList.toggle('active');
+                mainContent.classList.toggle('shifted');
+                navbar.classList.toggle('shifted');
+                document.body.classList.toggle('dimmed-for-menu');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (sideMenu.classList.contains('active') && !sideMenu.contains(event.target) && !burgerMenu.contains(event.target)) {
+                    burgerMenu.classList.remove('active');
+                    sideMenu.classList.remove('active');
+                    mainContent.classList.remove('shifted');
+                    navbar.classList.remove('shifted');
+                    document.body.classList.remove('dimmed-for-menu');
+                }
+            });
+
+            modals.forEach(modal => {
+                modal.addEventListener('show.bs.modal', () => {
+                    document.body.classList.add('modal-open');
+                });
+                modal.addEventListener('hidden.bs.modal', () => {
+                    document.body.classList.remove('modal-open');
+                });
+            });
+
+            if (findVehicleForm) {
+                findVehicleForm.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    vehicleSelectionDiv.style.display = 'block';
+                });
+            }
+
+            if (selectVehicleBtn) {
+                const vehicleRadioButtons = document.querySelectorAll('input[name="selectedVehicle"]');
+                vehicleRadioButtons.forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        selectVehicleBtn.disabled = false;
+                        selectedVehicle = this.value;
+                    });
+                });
+            }
+
+            window.showPaymentOptions = function () {
+                if (selectedVehicle) {
+                    vehicleSelectionDiv.style.display = 'none';
+                    paymentOptionsDiv.style.display = 'block';
+                    processPaymentBtn.disabled = true;
+                    const paymentRadioButtons = document.querySelectorAll('input[name="paymentMethod"]');
+                    paymentRadioButtons.forEach(radio => {
+                        radio.addEventListener('change', function () {
+                            processPaymentBtn.disabled = false;
+                            paymentMethod = this.value;
+                        });
+                    });
+                } else {
+                    alert('Please select a vehicle first.');
+                }
+            };
+
+            window.processPayment = function () {
+                if (selectedVehicle && paymentMethod) {
+                    alert(`Processing payment for ${selectedVehicle} via ${paymentMethod}. This would typically involve a payment gateway.`);
+                } else {
+                    alert('Please select a vehicle and a payment method.');
+                }
+            };
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TranspoRental - Admin</title>
+
+    <link rel="icon" href="img/icon.png" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-image: url('img/carousel-2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2); /* Decrease opacity here */
+            z-index: -1;
+        }
+
+        /* Class to apply the overlay effect when needed */
+        body.dimmed::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1040; /* Just below Bootstrap modal (z-index: 1050) */
+        }
+
+        /* Remove the dimming effect when a modal is open */
+        body.modal-open::before {
+            content: none;
+        }
+
+
+        main {
+            flex: 1;
+            z-index: 1;
+        }
+
+        footer {
+            margin-top: auto;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-text {
+            color: #fff;
+        }
+
+        .btn {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .btn-primary,
+        .btn-secondary,
+        .btn-success,
+        .btn-warning,
+        .btn-info,
+        .btn-dark {
+            border-radius: 30px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #f8f9fa;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #e0e0e0;
+        }
+
+        /* Styling for the burger icon */
+        .burger-menu {
+            display: block;
+            cursor: pointer;
+            font-size: 30px;
+            color: #fff;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%); /* Vertically center the burger icon */
+            z-index: 10;
+        }
+
+        .burger-menu.active {
+            color: #ddd;
+        }
+
+        /* The sliding menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #222;
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu .menu-link {
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+            display: block;
+            font-size: 18px;
+        }
+
+        .side-menu .menu-link:hover {
+            background-color: #333;
+        }
+
+        /* Navbar adjustments to make sure burger icon is aligned with brand */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Add some space between the icon and the name */
+        }
+
+        .navbar-toggler {
+            display: none; /* Hide the default toggler */
+        }
+
+        /* General modal adjustments - more constrained size */
+.modal-dialog {
+  max-width: 700px; /* Adjust this value as needed to control the width */
+  /* Remove max-height to allow content to determine height, potentially with scrolling */
+  margin: 1.75rem auto; /* Center the modal */
+}
+
+.modal-content {
+  /* Remove max-height to allow content to determine height */
+  /* Keep overflow-y: auto to handle cases where content exceeds the viewport */
+  overflow-y: auto;
+}
+
+/* Specific to the "Add New Vehicle" modal form */
+#addVehicleForm .row {
+  margin-bottom: 1rem; /* Add spacing between rows */
+}
+
+#addVehicleForm .col-md-6 {
+  display: inline-block;
+  width: calc(50% - 0.5rem);
+  margin-right: 0.5rem;
+}
+
+#addVehicleForm .form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+#addVehicleForm .form-control,
+#addVehicleForm .form-select {
+  width: 100%;
+}
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modals = document.querySelectorAll('.modal'); // Ensure your modals have the class 'modal'
+
+            modals.forEach(modalEl => {
+                modalEl.addEventListener('show.bs.modal', () => {
+                    document.body.classList.add('dimmed');
+                });
+
+                modalEl.addEventListener('hidden.bs.modal', () => {
+                    document.body.classList.remove('dimmed');
+                });
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <div class="burger-menu" id="burgerMenu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <a class="navbar-brand" href="index.html"><i class="fas fa-car-side me-2"></i>TranspoRental</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin.html">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="accounting-manager-dashboard.html">Accounting</a></li>
+                    <li class="nav-item"><a class="nav-link" href="operation.html">Operations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="qc-manager.html">Quality Control</a></li>
+                    <li class="nav-item"><a class="nav-link" href="marketing-dashboard.html">Marketing & Sales</a></li>
+                    <li class="nav-item"><a class="nav-link" href="customer.html">Customer</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="side-menu" id="sideMenu">
+        <a href="admin.html" class="menu-link">Admin</a>
+        <a href="accounting-manager-dashboard.html" class="menu-link">Accounting</a>
+        <a href="operation.html" class="menu-link">Operations</a>
+        <a href="qc-manager.html" class="menu-link">Quality Control</a>
+        <a href="marketing-dashboard.html" class="menu-link">Marketing & Sales</a>
+        <a href="customer.html" class="menu-link">Customer Portal</a>
+    </div>
+
+
+    <main class="container my-5">
+        <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center p-3">
+                <i class="fas fa-user-check fa-3x mb-2 text-primary"></i>
+                <h5 class="card-title">Customers Awaiting Approval</h5>
+                <p class="card-text" id="pendingCustomersCount">5</p>
+                <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#customerApprovalModal">Review & Approve</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center p-3">
+                <i class="fas fa-calendar-check fa-3x mb-2 text-info"></i>
+                <h5 class="card-title">Bookings Awaiting Approval</h5>
+                <p class="card-text" id="pendingBookingsCount">10</p>
+                <a href="#" class="btn btn-outline-info btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#bookingApprovalModal">Review Bookings</a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center p-3">
+                <i class="fas fa-exclamation-triangle fa-3x mb-2 text-warning"></i>
+                <h5 class="card-title">Open Disputes</h5>
+                <p class="card-text" id="openDisputesCount">3</p>
+                <a href="#" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal"
+                    data-bs-target="#manageDisputesModal">Manage Disputes</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="card p-3">
+                <h5 class="card-title">Recent Activities</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Timestamp</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Customer registered</td>
+                                <td>2025-05-03 18:15:00</td>
+                                <td>New customer: Alice Brown</td>
+                            </tr>
+                            <tr>
+                                <td>Booking created</td>
+                                <td>2025-05-03 17:50:00</td>
+                                <td>Booking #B202 for Car Model X</td>
+                            </tr>
+                            <tr>
+                                <td>Dispute opened</td>
+                                <td>2025-05-03 17:30:00</td>
+                                <td>Dispute for Booking #B198 by Bob Green</td>
+                            </tr>
+                            <tr>
+                                <td>Vehicle return logged</td>
+                                <td>2025-05-03 16:45:00</td>
+                                <td>Vehicle #V456 returned</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="#" class="btn btn-outline-light btn-sm mt-2">View All Activities</a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+    <div class="card p-3">
+        <h5 class="card-title">Quick Actions</h5>
+        <div class="d-grid gap-2">
+            <button class="btn btn-success" type="button" data-bs-toggle="modal"
+                data-bs-target="#finalizeBookingModal"><i class="fas fa-check me-2"></i>Finalize Booking</button>
+            <button class="btn btn-info" type="button" data-bs-toggle="modal"
+                data-bs-target="#addVehicleFormModal"><i class="fas fa-plus-circle me-2"></i>Add New Vehicle</button>
+            <button class="btn btn-warning" type="button" data-bs-toggle="modal"
+                data-bs-target="#viewReportsModal"><i class="fas fa-chart-bar me-2"></i>View Reports</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addVehicleFormModal" tabindex="-1" aria-labelledby="addVehicleFormModalLabel"
+    aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVehicleFormModalLabel">Add New Vehicle Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addVehicleForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="vehicleMake" class="form-label">Vehicle Make</label>
+                            <input type="text" class="form-control bg-dark text-white" id="vehicleMake" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicleModel" class="form-label">Vehicle Model</label>
+                            <input type="text" class="form-control bg-dark text-white" id="vehicleModel" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="vehicleYear" class="form-label">Year</label>
+                            <input type="number" class="form-control bg-dark text-white" id="vehicleYear" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="vehicleColor" class="form-label">Color</label>
+                            <input type="text" class="form-control bg-dark text-white" id="vehicleColor" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="rentalPrice" class="form-label">Rental Price (per day)</label>
+                            <input type="number" class="form-control bg-dark text-white" id="rentalPrice" step="0.01"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="availability" class="form-label">Availability</label>
+                        <select class="form-select bg-dark text-white" id="availability">
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vehicleImage" class="form-label">Vehicle Image</label>
+                        <input type="file" class="form-control bg-dark text-white" id="vehicleImage" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Add Vehicle</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    
+        <div class="modal fade" id="customerApprovalModal" tabindex="-1" aria-labelledby="customerApprovalModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="customerApprovalModalLabel">Customers Awaiting Approval</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Customer ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Registration Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>CUST001</td>
+                                    <td>New User One</td>
+                                    <td>newone@example.com</td>
+                                    <td>2025-05-03 18:00:00</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Approve</button>
+                                        <button class="btn btn-danger btn-sm">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>CUST002</td>
+                                    <td>Another New User</td>
+                                    <td>another@example.com</td>
+                                    <td>2025-05-03 17:45:00</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Approve</button>
+                                        <button class="btn btn-danger btn-sm">Reject</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="modal fade" id="bookingApprovalModal" tabindex="-1" aria-labelledby="bookingApprovalModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingApprovalModalLabel">Bookings Awaiting Approval</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Vehicle</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BKG005</td>
+                                    <td>Some Customer</td>
+                                    <td>Vehicle Y</td>
+                                    <td>2025-05-05</td>
+                                    <td>2025-05-07</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Approve</button>
+                                        <button class="btn btn-danger btn-sm">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BKG006</td>
+                                    <td>Another Customer</td>
+                                    <td>Vehicle Z</td>
+                                    <td>2025-05-06</td>
+                                    <td>2025-05-09</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm">Approve</button>
+                                        <button class="btn btn-danger btn-sm">Reject</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="modal fade" id="finalizeBookingModal" tabindex="-1" aria-labelledby="finalizeBookingModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="finalizeBookingModalLabel">Finalize Booking & Set Handover</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>List of approved bookings awaiting finalization. Set the handover schedule for each.</p>
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Vehicle</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Handover Schedule</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approvedBookingsList">
+                                <tr>
+                                    <td>BKG007</td>
+                                    <td>Yet Another Customer</td>
+                                    <td>Vehicle A</td>
+                                    <td>2025-05-07</td>
+                                    <td>2025-05-09</td>
+                                    <td><input type="datetime-local" class="form-control form-control-sm bg-dark text-white" id="handover-BKG007"></td>
+                                    <td><button class="btn btn-success btn-sm finalize-btn" data-booking-id="BKG007">Finalize</button></td>
+                                </tr>
+                                <tr>
+                                    <td>BKG008</td>
+                                    <td>One More Customer</td>
+                                    <td>Vehicle B</td>
+                                    <td>2025-05-08</td>
+                                    <td>2025-05-10</td>
+                                    <td><input type="datetime-local" class="form-control form-control-sm bg-dark text-white" id="handover-BKG008"></td>
+                                    <td><button class="btn btn-success btn-sm finalize-btn" data-booking-id="BKG008">Finalize</button></td>
+                                </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="modal fade" id="manageDisputesModal" tabindex="-1" aria-labelledby="manageDisputesModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manageDisputesModalLabel">Manage Disputes</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-dark table-striped" id="manageDisputesTable">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Reason</th>
+                                    <th>Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>DISP001</td>
+                                    <td>Customer A</td>
+                                    <td>Damage Claim</td>
+                                    <td>500.00</td>
+                                    <td><button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#resolveDisputeModal"
+                                            data-booking-id="DISP001"
+                                            data-customer="Customer A"
+                                            data-reason="Damage Claim"
+                                            data-amount="500.00">View Details</button></td>
+                                </tr>
+                                <tr>
+                                    <td>DISP002</td>
+                                    <td>Customer B</td>
+                                    <td>Billing Issue</td>
+                                    <td>100.00</td>
+                                    <td><button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#resolveDisputeModal"
+                                            data-booking-id="DISP002"
+                                            data-customer="Customer B"
+                                            data-reason="Billing Issue"
+                                            data-amount="100.00">View Details</button></td>
+                                </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="modal fade" id="resolveDisputeModal" tabindex="-1" aria-labelledby="resolveDisputeModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resolveDisputeModalLabel">Resolve Dispute</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="resolveDisputeForm">
+                            <div class="mb-3">
+                                <label for="disputeBookingId" class="form-label">Booking ID</label>
+                                <input type="text" class="form-control bg-dark text-white" id="disputeBookingId" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeCustomerName" class="form-label">Customer Name</label>
+                                <input type="text" class="form-control bg-dark text-white" id="disputeCustomerName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeReason" class="form-label">Dispute Reason</label>
+                                <textarea class="form-control bg-dark text-white" id="disputeReason" rows="3"
+                                    readonly></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeAmount" class="form-label">Disputed Amount</label>
+                                <input type="number" class="form-control bg-dark text-white" id="disputeAmount" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeEvidence" class="form-label">Supporting Evidence</label>
+                                <input type="file" class="form-control bg-dark text-white" id="disputeEvidence">
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeResolution" class="form-label">Resolution Notes</label>
+                                <textarea class="form-control bg-dark text-white" id="disputeResolution" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="disputeStatus" class="form-label">Dispute Status</label>
+                                <select class="form-select bg-dark text-white" id="disputeStatus">
+                                    <option value="Open">Open</option>
+                                    <option value="In Review">In Review</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-warning w-100">Update Dispute</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    
+        <div class="modal fade" id="viewReportsModal" tabindex="-1" aria-labelledby="viewReportsModalLabel"
+            aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewReportsModalLabel">Reports Overview</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card p-3 bg-secondary text-white">
+                                    <h5 class="card-title">Booking Statistics</h5>
+                                    <canvas id="bookingReportChart"></canvas>
+                                    <a href="#" class="btn btn-outline-light btn-sm mt-2">View Detailed Booking Reports</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card p-3 bg-secondary text-white">
+                                    <h5 class="card-title">Revenue Overview</h5>
+                                    <canvas id="revenueReportChart"></canvas>
+                                    <a href="#" class="btn btn-outline-light btn-sm mt-2">View Revenue Reports</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <div class="card p-3 bg-secondary text-white">
+                                    <h5 class="card-title">Customer Feedback</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th>Booking ID</th>
+                                                    <th>Customer</th>
+                                                    <th>Rating</th>
+                                                    <th>Comment</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>BKG001</td>
+                                                    <td>Customer X</td>
+                                                    <td>5/5</td>
+                                                    <td>Excellent service!</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>BKG003</td>
+                                                    <td>Customer Y</td>
+                                                    <td>4/5</td>
+                                                    <td>Good experience.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-warning btn-sm mt-2">View All Feedback</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Sample Report Chart Data (Replace with your actual data)
+        const bookingReportData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [{
+                label: 'New Bookings',
+                data: [55, 70, 85, 75, 95],
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+    
+        const revenueReportData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            datasets: [{
+                label: 'Monthly Revenue (PHP)',
+                data: [52000, 78000, 95000, 83000, 115000],
+                backgroundColor: 'rgba(255, 206, 86, 0.7)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1
+            }]
+        };
+    
+        // Report Chart Configuration
+        const bookingReportChartConfig = {
+            type: 'bar',
+            data: bookingReportData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white' // Set y-axis label color to white
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'white' // Set x-axis label color to white
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        titleColor: 'black', // Set tooltip title color
+                        bodyColor: 'black',   // Set tooltip body color
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)' // Light background with some transparency
+                    },
+                    legend: {
+                        labels: {
+                            color: 'white' // Set legend label color
+                        }
+                    }
+                }
+            }
+        };
+    
+        const revenueReportChartConfig = {
+            type: 'line',
+            data: revenueReportData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white' // Set y-axis label color to white
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'white' // Set x-axis label color to white
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        titleColor: 'black', // Set tooltip title color
+                        bodyColor: 'black',   // Set tooltip body color
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)' // Light background with some transparency
+                    },
+                    legend: {
+                        labels: {
+                            color: 'white' // Set legend label color
+                        }
+                    }
+                }
+            }
+        };
+    
+        // Create Report Charts
+        const bookingReportChart = new Chart(
+            document.getElementById('bookingReportChart'),
+            bookingReportChartConfig
+        );
+    
+        const revenueReportChart = new Chart(
+            document.getElementById('revenueReportChart'),
+            revenueReportChartConfig
+        );
+    
+        document.addEventListener('DOMContentLoaded', function () {
+            const customerApprovalModalEl = document.getElementById('customerApprovalModal');
+            const bookingApprovalModalEl = document.getElementById('bookingApprovalModal');
+            const finalizeBookingModalEl = document.getElementById('finalizeBookingModal');
+            const approvedBookingsList = document.getElementById('approvedBookingsList');
+            const manageDisputesModalEl = document.getElementById('manageDisputesModal');
+            const resolveDisputeModalEl = document.getElementById('resolveDisputeModal');
+            const viewReportsModalEl = document.getElementById('viewReportsModal');
+    
+            // Generic modal show event listener
+            const handleModalShow = (modalEl) => {
+                modalEl.addEventListener('show.bs.modal', () => {
+                    document.body.classList.add('dimmed');
+                });
+            };
+    
+            handleModalShow(customerApprovalModalEl);
+            handleModalShow(bookingApprovalModalEl);
+            handleModalShow(finalizeBookingModalEl);
+            handleModalShow(manageDisputesModalEl);
+            handleModalShow(resolveDisputeModalEl);
+            handleModalShow(viewReportsModalEl);
+    
+            // Generic modal hide event listener
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modalEl => {
+                modalEl.addEventListener('hidden.bs.modal', () => {
+                    document.body.classList.remove('dimmed');
+                });
+            });
+    
+            // Populate Resolve Dispute Modal
+            const manageDisputesTable = document.getElementById('manageDisputesTable');
+            if (manageDisputesTable && resolveDisputeModalEl) {
+                manageDisputesTable.addEventListener('click', (event) => {
+                    const viewDetailsButton = event.target.closest('.btn-warning');
+                    if (viewDetailsButton) {
+                        const bookingId = viewDetailsButton.dataset.bookingId;
+                        const customer = viewDetailsButton.dataset.customer;
+                        const reason = viewDetailsButton.dataset.reason;
+                        const amount = viewDetailsButton.dataset.amount;
+    
+                        document.getElementById('disputeBookingId').value = bookingId;
+                        document.getElementById('disputeCustomerName').value = customer;
+                        document.getElementById('disputeReason').value = reason;
+                        document.getElementById('disputeAmount').value = amount;
+    
+                        const modal = new bootstrap.Modal(resolveDisputeModalEl);
+                        modal.show();
+                    }
+                });
+            }
+    
+            finalizeBookingModalEl.addEventListener('show.bs.modal', () => {
+                // --- Replace this with your actual API call to fetch approved bookings ---
+                const approvedBookingsData = [
+                    { bookingId: 'BKG007', customer: 'Yet Another Customer', vehicle: 'Vehicle A', startDate: '2025-05-07', endDate: '2025-05-09' },
+                    { bookingId: 'BKG008', customer: 'One More Customer', vehicle: 'Vehicle B', startDate: '2025-05-08', endDate: '2025-05-10' },
+                    // ... more approved bookings
+                ];
+    
+                approvedBookingsList.innerHTML = ''; // Clear previous data
+    
+                approvedBookingsData.forEach(booking => {
+                    const row = approvedBookingsList.insertRow();
+                    row.insertCell().textContent = booking.bookingId;
+                    row.insertCell().textContent = booking.customer;
+                    row.insertCell().textContent = booking.vehicle;
+                    row.insertCell().textContent = booking.startDate;
+                    row.insertCell().textContent = booking.endDate;
+                    const handoverCell = row.insertCell();
+                    const handoverInput = document.createElement('input');
+                    handoverInput.type = 'datetime-local';
+                    handoverInput.classList.add('form-control', 'form-control-sm', 'bg-dark', 'text-white');
+                    handoverInput.id = `handover-${booking.bookingId}`;
+                    handoverCell.appendChild(handoverInput);
+                    const actionCell = row.insertCell();
+                    const finalizeButton = document.createElement('button');
+                    finalizeButton.classList.add('btn', 'btn-success', 'btn-sm', 'finalize-btn');
+                    finalizeButton.textContent = 'Finalize';
+                    finalizeButton.dataset.bookingId = booking.bookingId;
+                    actionCell.appendChild(finalizeButton);
+                });
+            });
+    
+            // Event listener for the "Finalize" button
+            document.addEventListener('click', (event) => {
+                if (event.target.classList.contains('finalize-btn')) {
+                    const bookingId = event.target.dataset.bookingId;
+                    const handoverScheduleInput = document.getElementById(`handover-${bookingId}`);
+                    if (handoverScheduleInput) {
+                        const handoverTime = handoverScheduleInput.value;
+                        if (handoverTime) {
+                            // --- Replace this with your actual API call to finalize the booking ---
+                            console.log(`Finalizing booking ${bookingId} with handover at ${handoverTime}`);
+                            // You would typically send a request to your backend here
+                        } else {
+                            alert('Please set the handover schedule.');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+        <script>
+            // Toggle the side menu
+            const burgerMenu = document.getElementById('burgerMenu');
+            const sideMenu = document.getElementById('sideMenu');
+    
+            if (burgerMenu && sideMenu) {
+                burgerMenu.addEventListener('click', () => {
+                    sideMenu.classList.toggle('active');
+                    burgerMenu.classList.toggle('active');
+                });
+            }
+        </script>
+        <footer class="bg-dark text-white text-center py-3">
+            <div class="container">
+                <small>&copy; 2025 TranspoRental. All rights reserved.</small>
+            </div>
+        </footer>
+    </body>
+    
+    </html>
